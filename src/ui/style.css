@@ -64,6 +64,11 @@ header.top {
   gap: 10px;
 }
 
+.brand .lang {
+  margin-left: auto;
+  letter-spacing: 0.08em;
+}
+
 .dot {
   width: 9px;
   height: 9px;

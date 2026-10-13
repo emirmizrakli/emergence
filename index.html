@@ -17,59 +17,63 @@
       <div class="brand">
         <span class="dot" id="status-dot" aria-hidden="true"></span>
         <h1>emergence</h1>
+        <button id="lang" class="mini lang" type="button" title="Türkçe'ye geç">EN</button>
       </div>
-      <p class="tagline">
+      <p class="tagline" data-i18n="brand.tagline">
         A transformer, an autodiff engine and a training loop — written from scratch, no dependencies —
         running live in this tab.
       </p>
       <div class="stats" id="stats">
-        <div class="stat"><span class="k">step</span><span class="v" id="s-step">0</span></div>
-        <div class="stat"><span class="k">loss</span><span class="v" id="s-loss">—</span></div>
-        <div class="stat"><span class="k">val</span><span class="v" id="s-val">—</span></div>
-        <div class="stat"><span class="k">lr</span><span class="v" id="s-lr">—</span></div>
-        <div class="stat"><span class="k">tok/s</span><span class="v" id="s-tps">—</span></div>
-        <div class="stat"><span class="k">params</span><span class="v" id="s-params">—</span></div>
-        <div class="stat"><span class="k">step cost</span><span class="v" id="s-flops">—</span></div>
+        <div class="stat"><span class="k" data-i18n="stat.step">step</span><span class="v" id="s-step">0</span></div>
+        <div class="stat"><span class="k" data-i18n="stat.loss">loss</span><span class="v" id="s-loss">—</span></div>
+        <div class="stat"><span class="k" data-i18n="stat.val">val</span><span class="v" id="s-val">—</span></div>
+        <div class="stat"><span class="k" data-i18n="stat.lr">lr</span><span class="v" id="s-lr">—</span></div>
+        <div class="stat"><span class="k" data-i18n="stat.tps">tok/s</span><span class="v" id="s-tps">—</span></div>
+        <div class="stat"><span class="k" data-i18n="stat.params">params</span><span class="v" id="s-params">—</span></div>
+        <div class="stat"><span class="k" data-i18n="stat.cost">step cost</span><span class="v" id="s-flops">—</span></div>
       </div>
     </header>
 
     <main>
       <section class="panel p-loss">
-        <h2>Loss <em>train vs held-out</em></h2>
+        <h2><span data-i18n="panel.loss">Loss</span> <em data-i18n="panel.loss.em">train vs held-out</em></h2>
         <canvas id="c-loss" height="260"></canvas>
         <p class="hint" id="h-loss"></p>
       </section>
 
       <section class="panel p-next">
-        <h2>Next character <em>live distribution</em></h2>
+        <h2><span data-i18n="panel.next">Next character</span> <em data-i18n="panel.next.em">live distribution</em></h2>
         <div class="prompt-row">
-          <input id="prompt" type="text" spellcheck="false" value="ROMEO: " aria-label="prompt" />
-          <button id="prompt-go" class="mini">sample</button>
+          <input id="prompt" type="text" spellcheck="false" value="ROMEO: " data-i18n-aria="prompt.aria" aria-label="prompt" />
+          <button id="prompt-go" class="mini" data-i18n="btn.sample">sample</button>
         </div>
         <canvas id="c-next" height="260"></canvas>
         <p class="hint" id="h-next"></p>
       </section>
 
       <section class="panel p-attn">
-        <h2>Attention <em>layer <span id="attn-selector"></span></em></h2>
+        <h2>
+          <span data-i18n="panel.attn">Attention</span>
+          <em><span data-i18n="panel.attn.em">layer</span> <span id="attn-selector"></span></em>
+        </h2>
         <canvas id="c-attn" height="260"></canvas>
         <p class="hint" id="h-attn"></p>
       </section>
 
       <section class="panel p-space">
-        <h2>Embedding space <em>PCA of the learned vectors</em></h2>
+        <h2><span data-i18n="panel.space">Embedding space</span> <em data-i18n="panel.space.em">PCA of the learned vectors</em></h2>
         <canvas id="c-space" height="260"></canvas>
         <p class="hint" id="h-space"></p>
       </section>
 
       <section class="panel p-sample">
-        <h2>What it writes right now</h2>
-        <pre id="sample">start training to generate text…</pre>
+        <h2 data-i18n="panel.sample">What it writes right now</h2>
+        <pre id="sample" data-i18n="sample.idle">start training to generate text…</pre>
         <p class="hint" id="h-sample"></p>
       </section>
 
       <section class="panel p-tape">
-        <h2>Forward graph <em>cost per node, this configuration</em></h2>
+        <h2><span data-i18n="panel.tape">Forward graph</span> <em data-i18n="panel.tape.em">cost per node, this configuration</em></h2>
         <div class="table-wrap">
           <table id="tape"></table>
         </div>
@@ -77,62 +81,70 @@
       </section>
 
       <section class="panel p-grad">
-        <h2>Gradient flow <em>‖∂L/∂θ‖ per tensor</em></h2>
+        <h2><span data-i18n="panel.grad">Gradient flow</span> <em data-i18n="panel.grad.em">‖∂L/∂θ‖ per tensor</em></h2>
         <canvas id="c-grad" height="200"></canvas>
         <p class="hint" id="h-grad"></p>
       </section>
 
       <section class="panel p-controls">
-        <h2>Controls</h2>
+        <h2 data-i18n="panel.controls">Controls</h2>
         <div class="controls">
-          <label>architecture
+          <label><span data-i18n="ctrl.arch">architecture</span>
             <select id="arch">
-              <option value="gpt" selected>transformer (gpt)</option>
-              <option value="mlp">fixed-window MLP</option>
-              <option value="bigram">bigram table</option>
+              <option value="gpt" selected data-i18n="ctrl.arch.gpt">transformer (gpt)</option>
+              <option value="mlp" data-i18n="ctrl.arch.mlp">fixed-window MLP</option>
+              <option value="bigram" data-i18n="ctrl.arch.bigram">bigram table</option>
             </select>
           </label>
-          <label>size
+          <label><span data-i18n="ctrl.size">size</span>
             <select id="preset">
-              <option value="tiny">tiny — 40k params</option>
-              <option value="small" selected>small — 200k params</option>
-              <option value="medium">medium — 700k params</option>
+              <option value="tiny" data-i18n="ctrl.size.tiny">tiny — 28k params</option>
+              <option value="small" selected data-i18n="ctrl.size.small">small — 200k params</option>
+              <option value="medium" data-i18n="ctrl.size.medium">medium — 700k params</option>
             </select>
           </label>
-          <label>corpus
+          <label><span data-i18n="ctrl.corpus">corpus</span>
             <select id="corpus">
-              <option value="shakespeare" selected>tiny shakespeare (1.1 MB)</option>
-              <option value="paste">your own text</option>
+              <option value="shakespeare" selected data-i18n="ctrl.corpus.shakespeare">tiny shakespeare (1.1 MB)</option>
+              <option value="paste" data-i18n="ctrl.corpus.paste">your own text</option>
             </select>
           </label>
-          <label>learning rate <output id="lr-out">3.0e-3</output>
+          <label><span data-i18n="ctrl.lr">learning rate</span> <output id="lr-out">3.0e-3</output>
             <input id="lr" type="range" min="-4" max="-2" step="0.05" value="-2.523" />
           </label>
-          <label>warm start
+          <label><span data-i18n="ctrl.warm">warm start</span>
             <select id="warm">
-              <option value="none">from random noise</option>
-              <option value="shakespeare" selected>from the bundled checkpoint</option>
+              <option value="none" data-i18n="ctrl.warm.none">from random noise</option>
+              <option value="shakespeare" selected data-i18n="ctrl.warm.ckpt">from the bundled checkpoint</option>
             </select>
           </label>
           <div class="buttons">
-            <button id="run" class="primary">train</button>
-            <button id="reset">reset</button>
-            <a id="dl" class="mini" download="emergence-checkpoint.json">download weights</a>
+            <button id="run" class="primary" data-i18n="btn.train">train</button>
+            <button id="reset" data-i18n="btn.reset">reset</button>
+            <a id="dl" class="mini" download="emergence-checkpoint.json" data-i18n="btn.download">download weights</a>
           </div>
         </div>
-        <textarea id="corpus-text" spellcheck="false" placeholder="paste any text here — the tokenizer is rebuilt on it, and the model learns your text from scratch" hidden></textarea>
+        <textarea
+          id="corpus-text"
+          spellcheck="false"
+          data-i18n-placeholder="corpus.placeholder"
+          placeholder="paste any text here — the tokenizer is rebuilt on it, and the model learns your text from scratch"
+          hidden
+        ></textarea>
       </section>
     </main>
 
     <footer>
       <p>
-        Every number on this page comes from the code in <code>src/</code>: no ML library, no bundle of
-        pretrained weights, no GPU. Same code, same corpus, same seed, from the command line:
+        <span data-i18n="footer.body">
+          Every number on this page comes from the code in src/: no ML library, no bundle of pretrained
+          weights, no GPU. Same code, same corpus, same seed, from the command line:
+        </span>
         <code>node src/cli/train.ts --compare</code>.
       </p>
       <p class="fine">
         <a href="https://github.com/emirmizrakli/emergence">github.com/emirmizrakli/emergence</a> ·
-        MIT © Emir Mızraklı
+        <span data-i18n="footer.repo">MIT © Emir Mızraklı</span>
       </p>
     </footer>
 

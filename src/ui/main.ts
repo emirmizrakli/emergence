@@ -8,6 +8,7 @@
  */
 import { drawAttention, drawBars, drawEmbedding, drawGradNorms, drawLoss, type LossPoint } from './charts.ts';
 import { CORPORA, DEFAULT_PROMPT, PRESETS, WARM_START_URL } from './config.ts';
+import { initLang, t, toggleLang } from './i18n.ts';
 import type { GradRow, MainToWorker, Metrics, NextRow, WorkerToMain } from './protocol.ts';
 import type { AttentionSnapshot, EmbeddingSnapshot } from '../train/viz.ts';
 import type { GraphRow } from '../model/graph.ts';
@@ -67,7 +68,7 @@ function startRun(resetHistory = true): void {
   const corpusName = corpusKey === 'paste' && pasted.length > 40 ? 'pasted text' : 'tiny shakespeare';
   const lr = Math.pow(10, Number($<HTMLInputElement>('lr').value));
 
-  $('sample').textContent = 'warming up the first sample…';
+  $('sample').textContent = t('sample.warming');
 
   worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
   worker.onmessage = (event: MessageEvent<WorkerToMain>): void => {
@@ -102,7 +103,7 @@ function handle(msg: WorkerToMain): void {
       view.selected = { layer: Math.min(1, msg.metrics.config.nLayer - 1), head: 0 };
       buildHeadPicker();
       buildTape();
-      $('run').textContent = 'pause';
+      $('run').textContent = t('btn.pause');
       dirty = true;
       break;
     }
@@ -126,7 +127,7 @@ function handle(msg: WorkerToMain): void {
       if (msg.next && msg.next.length > 0) view.next = msg.next;
       if (msg.chars && msg.chars.length > 0) view.chars = msg.chars;
       if (msg.sampleChunk !== undefined) view.sample = msg.sampleChunk;
-      $('run').textContent = m.running ? 'pause' : 'train';
+      $('run').textContent = m.running ? t('btn.pause') : t('btn.train');
       dirty = true;
       break;
     }
@@ -222,28 +223,37 @@ function drawAll(): void {
   if (view.sample) $('sample').textContent = view.sample;
 
   if (m) {
-    $('h-loss').textContent =
-      `${num(m.step)}/${num(m.plannedSteps)} steps · ${secs(m.stepMs)}/step · ${secs(m.elapsedMs)} of compute · ` +
-      `learned on ${num(m.corpusChars)} characters · ${num(m.tokensPerSec * (m.elapsedMs / 1000))} characters processed so far`;
-    $('h-next').textContent =
-      `after "${$<HTMLInputElement>('prompt').value}" — the entire vocabulary is the ${num(m.vocabSize)} distinct characters in the corpus`;
+    $('h-loss').textContent = t('hint.loss', {
+      step: num(m.step),
+      planned: num(m.plannedSteps),
+      stepMs: secs(m.stepMs),
+      elapsed: secs(m.elapsedMs),
+      chars: num(m.corpusChars),
+      seen: num(m.tokensPerSec * (m.elapsedMs / 1000)),
+    });
+    $('h-next').textContent = t('hint.next', {
+      prompt: $<HTMLInputElement>('prompt').value,
+      vocab: num(m.vocabSize),
+    });
     $('h-attn').textContent = view.attention
-      ? `row i = where position i looked while predicting character i+1 · ${view.heads.length} heads total`
-      : 'attention exists only in the transformer — switch architecture to see it';
-    $('h-space').textContent =
-      `learned embeddings of all ${num(m.vocabSize)} characters, projected to 2d (power iteration PCA) · ${m.config.nEmbd}-dimensional vectors · orange = whitespace`;
-    $('h-sample').textContent =
-      `sampled from the live weights at step ${num(m.step)} · temperature 0.8, top-k 40 · the text above is regenerated as training continues`;
+      ? t('hint.attn', { heads: view.heads.length })
+      : t('hint.attn.none');
+    $('h-space').textContent = t('hint.space', { vocab: num(m.vocabSize), dim: m.config.nEmbd });
+    $('h-sample').textContent = t('hint.sample', { step: num(m.step) });
     $('h-tape').textContent = view.graph.length
-      ? `forward pass at context ${m.config.blockSize} · ${m.flopsLabel} FLOPs per step (forward + backward) · ${num(
-          m.flopsPerStep / (m.stepMs / 1000),
-        )} FLOPs/s`
+      ? t('hint.tape', {
+          block: m.config.blockSize,
+          flops: m.flopsLabel,
+          rate: num(m.flopsPerStep / (m.stepMs / 1000)),
+        })
       : '';
     $('h-grad').textContent = view.grads.length
-      ? `per-tensor gradient RMS, log scale · global grad norm is clipped to 1.0 · highest: ${view.grads
-          .slice()
-          .sort((a, b) => b.gradNorm - a.gradNorm)[0]
-          ?.name ?? ''}`
+      ? t('hint.grad', {
+          top:
+            view.grads
+              .slice()
+              .sort((a, b) => b.gradNorm - a.gradNorm)[0]?.name ?? '',
+        })
       : '';
   }
   if (view.error) $('h-sample').textContent = `⚠ ${view.error}`;
@@ -315,6 +325,12 @@ function wireControls(): void {
     if ((e as KeyboardEvent).key === 'Enter') inspect();
   });
 
+  $('lang').addEventListener('click', () => {
+    toggleLang();
+    dirty = true;
+    paint();
+  });
+
   $('dl').addEventListener('click', (e) => {
     e.preventDefault();
     worker?.postMessage({ type: 'export', meta: 'emergence checkpoint' } satisfies MainToWorker);
@@ -324,6 +340,7 @@ function wireControls(): void {
 /* ------------------------------------------------------------------- boot ---- */
 
 async function boot(): Promise<void> {
+  initLang();
   wireControls();
   requestAnimationFrame(loop);
   $<HTMLInputElement>('prompt').value = DEFAULT_PROMPT;

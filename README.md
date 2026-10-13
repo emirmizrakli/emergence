@@ -2,7 +2,7 @@
 
 **A transformer, a reverse-mode autodiff engine and a training loop — written from scratch, no runtime dependencies — that train live in your browser tab.**
 
-[**▶ watch it train**](https://emirmizrakli.github.io/emergence/) · [run the command line version](#run-it) · [read the code map](#what-is-actually-in-here)
+[**▶ watch it train**](https://emirmizrakli.github.io/emergence/) · [run the command line version](#run-it) · [read the code map](#what-is-actually-in-here) · **English** · [Türkçe](README.tr.md)
 
 Open the page and a character-level language model starts learning English in front of you. Not a recording, not a pre-rendered chart: the loss curve, the attention heads, the embedding space, the gradient norms and the text it writes are all recomputed from the weights as they change.
 
@@ -41,7 +41,7 @@ Both engines exist on purpose. The fast path is hand-written kernels, because te
 | `src/ui/` | `worker.ts`, `main.ts`, `charts.ts`, `style.css` | the worker that owns the model, the page orchestration, and a canvas renderer with no dependencies |
 | `src/cli/` | `train.ts` | headless training, with `--compare` to run all three architectures under an identical budget |
 
-**3,945 lines** of source, **693 lines** of tests, **0** runtime dependencies. Node 23+ runs the TypeScript directly — the CLI has no build step, because Node strips types natively.
+**4,215 lines** of source, **693 lines** of tests, **0** runtime dependencies. Node 23+ runs the TypeScript directly — the CLI has no build step, because Node strips types natively.
 
 ## Measured, not promised
 
@@ -117,7 +117,7 @@ The CLI reports tokens/second, parameter counts, held-out loss and perplexity fo
 node src/cli/train.ts --compare --steps 600
 ```
 
-The demo page's `medium` preset runs a 677k-parameter model; `small` (the bundled checkpoint's shape) is 207k parameters, 4 blocks, 4 heads, 48-character context, trained to a held-out loss around 1.9 on tiny shakespeare.
+The demo page's `medium` preset runs a 677k-parameter model; `small` (the bundled checkpoint's shape) is 207k parameters, 4 blocks, 4 heads, 48-character context, trained to a held-out loss of 2.309 on tiny shakespeare.
 
 Nothing here needs a GPU, and nothing here uses one: it is single-threaded JavaScript on your CPU, which is exactly why the numbers on the page are believable.
 
@@ -161,7 +161,7 @@ Being clear about the limits is part of the point:
 - **CPU only.** No GPU, no WebGPU, no WASM SIMD. Batches are tiny and models are small. This is a laboratory, not a training service.
 - **Character-level.** No BPE. The vocabulary is the distinct characters of the corpus (65 for Shakespeare).
 - **No KV cache.** Generation is deliberately O(n²) per character in order to keep one inference path.
-- **Small models.** 30k–700k parameters. It learns English prose, not facts.
+- **Small models.** 28k–677k parameters. It learns English prose, not facts.
 
 ## License
 
