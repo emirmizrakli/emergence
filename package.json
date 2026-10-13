@@ -36,7 +36,7 @@
     "cli": "node src/cli/train.ts",
     "sync": "node scripts/sync-corpora.mjs",
     "deploy": "node scripts/deploy-pages.mjs",
-    "train:shakespeare": "node src/cli/train.ts --model gpt --corpus data/tiny-shakespeare.txt --steps 4000 --eval 250 --sample-every 250 --batch 32 --block 48 --embd 64 --layers 4 --heads 4 --out checkpoints/shakespeare-gpt.json",
+    "train:shakespeare": "node src/cli/train.ts --model gpt --corpus data/tiny-shakespeare.txt --steps 2500 --eval 250 --sample-every 500 --batch 32 --block 48 --embd 64 --layers 4 --heads 4 --lr 1e-3 --out checkpoints/shakespeare-gpt.json",
     "train:compare": "node src/cli/train.ts --compare --steps 600"
   },
   "devDependencies": {

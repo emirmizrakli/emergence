@@ -55,6 +55,19 @@ Both engines exist on purpose. The fast path is hand-written kernels, because te
 
 The transformer is 30% *smaller* than the MLP and still wins: 106,304 parameters against 151,936, val perplexity 11.0 against 12.4. A fixed window treats every character in it as equally important; a causal mask does not. Full setup, the honest reading of each column, and a divergence that was measured and discarded are in [`docs/benchmarks.md`](docs/benchmarks.md).
 
+### The checkpoint the demo ships with
+
+Scale the `gpt` row up and you get the model the page starts from — same architecture, 4 layers instead of 2, 207,296 parameters, 2,500 steps:
+
+| | |
+| --- | --- |
+| parameters | 207,296 (nEmbd 64 · 4 layers · 4 heads · block 48) |
+| train loss | 2.225 (perplexity 9.3) |
+| val loss | **2.309** (perplexity **10.1**) |
+| what the page shows | step 11 reads loss ≈ 2.30, not the ≈4.17 of random weights |
+
+`npm run train:shakespeare` reproduces it, `npm run sync` stages it into `public/`, and the page checks the shape and the vocabulary before continuing from those weights. `--lr 1e-3` is not decoration: at 3e-3 this configuration diverges (see the benchmark notes).
+
 ## The three things worth reading
 
 ### 1. Two engines, and a test that makes them agree
