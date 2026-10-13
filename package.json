@@ -1,0 +1,46 @@
+{
+  "name": "emergence",
+  "version": "0.2.0",
+  "private": false,
+  "type": "module",
+  "description": "Watch a language model emerge from noise: a from-scratch transformer that trains live in your browser, with zero runtime dependencies.",
+  "keywords": [
+    "machine-learning",
+    "transformer",
+    "gpt",
+    "autograd",
+    "neural-network",
+    "from-scratch",
+    "typescript",
+    "education",
+    "visualization",
+    "webgpu"
+  ],
+  "license": "MIT",
+  "author": "Emir Mızraklı <emirmizrakli2525@gmail.com> (https://emirmizrakli.com.tr)",
+  "homepage": "https://emirmizrakli.github.io/emergence/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emirmizrakli/emergence.git"
+  },
+  "engines": {
+    "node": ">=23.6"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run sync && npm run typecheck && vite build",
+    "preview": "vite preview --port 4173",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "test:watch": "node --test --watch \"src/**/*.test.ts\"",
+    "cli": "node src/cli/train.ts",
+    "sync": "node scripts/sync-corpora.mjs",
+    "train:shakespeare": "node src/cli/train.ts --model gpt --corpus data/tiny-shakespeare.txt --steps 4000 --eval 250 --sample-every 250 --batch 32 --block 48 --embd 64 --layers 4 --heads 4 --out checkpoints/shakespeare-gpt.json",
+    "train:compare": "node src/cli/train.ts --compare --steps 600"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  }
+}
