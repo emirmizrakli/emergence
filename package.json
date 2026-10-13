@@ -35,6 +35,7 @@
     "test:watch": "node --test --watch \"src/**/*.test.ts\"",
     "cli": "node src/cli/train.ts",
     "sync": "node scripts/sync-corpora.mjs",
+    "deploy": "node scripts/deploy-pages.mjs",
     "train:shakespeare": "node src/cli/train.ts --model gpt --corpus data/tiny-shakespeare.txt --steps 4000 --eval 250 --sample-every 250 --batch 32 --block 48 --embd 64 --layers 4 --heads 4 --out checkpoints/shakespeare-gpt.json",
     "train:compare": "node src/cli/train.ts --compare --steps 600"
   },

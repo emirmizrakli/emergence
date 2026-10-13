@@ -10,7 +10,10 @@ export interface OptimizerConfig {
   beta1: number;
   beta2: number;
   eps: number;
-  /** Decoupled decay applied to weights (not to biases / norms). */
+  /**
+   * Weight decay, folded into the gradient as L2 (not decoupled AdamW) and
+   * applied only to real weight matrices — biases and norms are left alone.
+   */
   weightDecay: number;
   /** Global gradient-norm clip; 0 disables clipping. */
   gradClip: number;

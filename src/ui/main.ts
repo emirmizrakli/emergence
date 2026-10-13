@@ -48,7 +48,6 @@ let worker: Worker | null = null;
 let corpusText = '';
 let warmCheckpoint: string | null = null;
 let dirty = true;
-let frameSkip = 0;
 
 const num = (n: number): string => n.toLocaleString('en-US');
 
@@ -250,17 +249,24 @@ function drawAll(): void {
   if (view.error) $('h-sample').textContent = `⚠ ${view.error}`;
 }
 
+function paint(): void {
+  if (!dirty) return;
+  dirty = false;
+  drawAll();
+}
+
 function loop(): void {
-  frameSkip = (frameSkip + 1) % 2;
-  if (dirty && frameSkip === 0) {
-    dirty = false;
-    drawAll();
-  } else if (dirty) {
-    drawAll();
-    dirty = false;
-  }
+  paint();
   requestAnimationFrame(loop);
 }
+
+// requestAnimationFrame stops while a tab is hidden — a background tab, a phone
+// with the screen off, some embedded viewers. Relying on it alone leaves the
+// page looking frozen until it is focused again, so paint on a slow timer too,
+// and once more the moment the tab comes back.
+setInterval(paint, 250);
+document.addEventListener('visibilitychange', paint);
+
 
 /* ---------------------------------------------------------------- controls --- */
 
@@ -333,7 +339,9 @@ async function boot(): Promise<void> {
 
   try {
     const res = await fetch(WARM_START_URL);
-    warmCheckpoint = res.ok ? await res.text() : null;
+    const text = res.ok ? await res.text() : null;
+    // a missing checkpoint can still answer 200 with an html fallback page
+    warmCheckpoint = text && text.trimStart().startsWith('{') ? text : null;
   } catch {
     warmCheckpoint = null;
   }

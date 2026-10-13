@@ -1,0 +1,23 @@
+name: checks
+
+# This workflow is manual on purpose: the account that owns this repository has
+# GitHub Actions disabled (billing), so a run on every push would only produce
+# red X's. Run it yourself from the Actions tab once that is sorted — the demo
+# page is deployed from the `gh-pages` branch instead (`npm run deploy`).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: typecheck + tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test

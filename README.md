@@ -29,7 +29,7 @@ So this project deliberately removes every abstraction that would hide the answe
 - Adam with warmup, cosine decay and gradient clipping,
 - a trainer, a checkpoint format, a CLI, and a worker-thread UI.
 
-Both engines exist on purpose. The fast path is hand-written kernels, because tensor gymnastics through a generic tape is 10× slower. But hand-written gradients can be quietly wrong — so an independent autodiff implementation doubles as an oracle, and both are checked against numerical differentiation (`src/core/gradCheck.ts`). If a hand-written backward pass disagrees with finite differences, the test suite fails. That is the whole safety argument, and it is enforced in CI rather than asserted in a README.
+Both engines exist on purpose. The fast path is hand-written kernels, because tensor gymnastics through a generic tape is 10× slower. But hand-written gradients can be quietly wrong — so an independent autodiff implementation doubles as an oracle, and both are checked against numerical differentiation (`src/core/gradCheck.ts`). If a hand-written backward pass disagrees with finite differences, the test suite fails. That is the whole safety argument, and it is enforced by tests instead of asserted in a README.
 
 ## What is actually in here
 
@@ -42,6 +42,18 @@ Both engines exist on purpose. The fast path is hand-written kernels, because te
 | `src/cli/` | `train.ts` | headless training, with `--compare` to run all three architectures under an identical budget |
 
 **3,945 lines** of source, **693 lines** of tests, **0** runtime dependencies. Node 23+ runs the TypeScript directly — the CLI has no build step, because Node strips types natively.
+
+## Measured, not promised
+
+`node src/cli/train.ts --compare --steps 600` trains all three rungs on the same corpus with the same budget. Real output, on one laptop CPU core:
+
+| model | params | first loss | final loss | val loss | val perplexity | minutes |
+| --- | --- | --- | --- | --- | --- | --- |
+| bigram | 4,225 | 4.179 | 3.183 | 3.205 | 24.7 | 0.0 |
+| mlp | 151,936 | 4.174 | 2.410 | 2.516 | 12.4 | 6.2 |
+| gpt | 106,304 | 4.170 | **2.287** | **2.393** | **11.0** | 4.9 |
+
+The transformer is 30% *smaller* than the MLP and still wins: 106,304 parameters against 151,936, val perplexity 11.0 against 12.4. A fixed window treats every character in it as equally important; a causal mask does not. Full setup, the honest reading of each column, and a divergence that was measured and discarded are in [`docs/benchmarks.md`](docs/benchmarks.md).
 
 ## The three things worth reading
 
@@ -116,6 +128,18 @@ npm run build            # static build into dist/
 ```
 
 Try it with your own text: `npm run dev`, set *corpus* to **your own text**, paste something, and the tokenizer is rebuilt on it — the model then learns your text from scratch, from random noise, in front of you.
+
+## Deploying the demo page
+
+```bash
+npm run deploy     # builds, then force-pushes dist/ to a gh-pages branch
+```
+
+One-time setup: **Settings → Pages → Source: Deploy from a branch → `gh-pages` → `/ (root)`.**
+The page is static, so it needs no serverless functions, no build minutes and no
+runner: publishing is a `git push`. (The Actions workflow in `.github/workflows/`
+is a manual typecheck + test runner, intentionally not a deployer — nothing here
+depends on CI to be released.)
 
 ## What this is not
 
